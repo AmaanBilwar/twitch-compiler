@@ -1,19 +1,30 @@
-from playwright.sync_api import sync_playwright
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
+from flask import Flask, request, jsonify, render_template
 
 
+app = Flask(__name__)
 
+@app.route('/')
+def index():
+    return render_template('collect-clips.html')
 
+@app.route('/collect-clips', methods=['POST'])
+def collect_clips():
+    try:
+        username = request.form.get('username')
+        
+        if not username:
+            return jsonify({'error': 'Username is required'}), 400
+            
+        from clips_collector import collect_clip_urls
+        collect_clip_urls(username)
+        
+        return jsonify({
+            'message': f'Successfully collected clips for {username}',
+            'filename': f'{username}_clips.csv'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True)
-    page = browser.new_page()
-    page.goto("https://www.twitch.tv/")
-    page.wait_for_timeout(10000)
-    browser.close()
-
-
-
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
