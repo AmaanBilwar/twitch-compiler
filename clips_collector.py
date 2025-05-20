@@ -23,7 +23,7 @@ def collect_clip_urls(username, num_clips=20):
         page.wait_for_timeout(2000)
         
         # Create CSV file
-        csv_filename = f'{username}_clips.csv'
+        csv_filename = f'outputs/{username}_clips.csv'
         with open(csv_filename, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['Clip URL'])
