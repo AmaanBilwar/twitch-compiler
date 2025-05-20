@@ -5,9 +5,10 @@ import csv
 import time
 import urllib.parse
 
+
 load_dotenv()
 
-def collect_clip_urls(username, num_clips=20):
+def collect_clip_urls(username, num_clips=2):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
@@ -23,6 +24,7 @@ def collect_clip_urls(username, num_clips=20):
         page.wait_for_timeout(2000)
         
         # Create CSV file
+        os.makedirs('outputs', exist_ok=True)
         csv_filename = f'outputs/{username}_clips.csv'
         with open(csv_filename, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)

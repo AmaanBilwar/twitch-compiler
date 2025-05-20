@@ -1,3 +1,9 @@
+for this to work: 
+- you need ffmpeg
+- you need twitchdownloaderCLI
+- python
+
+
 # Twitch Clips Compilation Bot
 
 A Python bot that automatically:
