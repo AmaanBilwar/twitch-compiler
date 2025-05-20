@@ -8,7 +8,8 @@ import urllib.parse
 
 load_dotenv()
 
-def collect_clip_urls(username, num_clips=2):
+def collect_clip_urls(username, num_clips=10):
+    print(f"Starting to collect {num_clips} clips for {username}")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
@@ -32,9 +33,13 @@ def collect_clip_urls(username, num_clips=2):
             
             # Find and process clips
             clip_containers = page.query_selector_all('div.clip-entity')
-            processed_count = 0
+            total_clips_found = len(clip_containers)
+            print(f"Found {total_clips_found} clips on the page")
             
-            for clip in clip_containers[:num_clips]:
+            processed_count = 0
+            target_clips = min(num_clips, total_clips_found)
+            
+            for clip in clip_containers[:target_clips]:
                 try:
                     # Click the clip
                     clip.click()
@@ -54,7 +59,7 @@ def collect_clip_urls(username, num_clips=2):
                             clip_url = f'https://clips.twitch.tv/{clip_id}'
                             writer.writerow([clip_url])
                             processed_count += 1
-                            print(f"Processed clip {processed_count}/{num_clips}: {clip_url}")
+                            print(f"Processed clip {processed_count}/{target_clips}: {clip_url}")
                         else:
                             print("Could not extract clip ID from iframe src.")
                     else:
@@ -75,7 +80,9 @@ def collect_clip_urls(username, num_clips=2):
         
         browser.close()
         print(f"Successfully collected {processed_count} clip URLs. Saved to {csv_filename}")
+        return processed_count
 
 if __name__ == "__main__":
     username = input("Enter the username of the streamer: ")
-    collect_clip_urls(username)
+    num_clips = int(input("Enter number of clips to collect: "))
+    collect_clip_urls(username, num_clips)
